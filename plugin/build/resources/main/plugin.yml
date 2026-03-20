@@ -1,0 +1,25 @@
+name: HubCore
+version: "1.0.0"
+main: com.indifferenzah.hubcore.plugin.HubCorePlugin
+api-version: "1.21"
+description: "Plugin PvP per lobby/hub"
+author: Indifferenzah
+
+commands:
+  hubcore:
+    description: Comando principale HubCore
+    usage: /hubcore [reload]
+  pvp:
+    description: Comandi PvP
+    usage: /pvp <stats|reset> [giocatore]
+
+permissions:
+  hubcore.reload:
+    description: Permesso per ricaricare la configurazione
+    default: op
+  hubcore.pvp.stats:
+    description: Permesso per vedere le statistiche PvP
+    default: true
+  hubcore.pvp.reset:
+    description: Permesso per azzerare le statistiche PvP
+    default: op

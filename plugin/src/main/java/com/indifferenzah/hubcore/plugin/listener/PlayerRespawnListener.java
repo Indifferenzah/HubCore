@@ -1,0 +1,37 @@
+package com.indifferenzah.hubcore.plugin.listener;
+
+import com.indifferenzah.hubcore.plugin.HubCorePlugin;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerRespawnEvent;
+
+/**
+ * Listener per la gestione del rispawn del giocatore.
+ */
+public class PlayerRespawnListener implements Listener {
+
+    private final HubCorePlugin plugin;
+
+    public PlayerRespawnListener(HubCorePlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        var player = event.getPlayer();
+
+        // Applica il delay di rispawn: il giocatore non puo' attivare il PvP per un certo periodo
+        plugin.getPvpService().applyRespawnDelay(player.getUniqueId());
+
+        // Consegna spada e armatura PvP dopo il rispawn
+        // Piccolo delay per assicurarsi che l'inventario sia pronto
+        org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (!player.isOnline()) return;
+            if (!plugin.getSwordManager().hasSword(player)) {
+                plugin.getSwordManager().giveSword(player);
+            }
+            // L'armatura viene data solo quando il PvP viene attivato, non al rispawn
+        }, 1L);
+    }
+}

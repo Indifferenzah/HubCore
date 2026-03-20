@@ -1,0 +1,64 @@
+# ============================================================
+#  HubCore - Messaggi
+#  Usa & per i codici colore, &#rrggbb per i colori esadecimali
+#  Segnaposto disponibili: {prefix} viene sostituito automaticamente
+# ============================================================
+
+# ============================================================
+#  PVP
+# ============================================================
+pvp:
+  # Messaggio inviato durante il delay di attivazione
+  enabling: "{prefix} &ePvP in attivazione tra &a{seconds} secondi&e..."
+  # Messaggio inviato quando il delay di attivazione e' annullato
+  enable-cancelled: "{prefix} &cAttivazione PvP annullata."
+  # Messaggio inviato quando il PvP e' attivato
+  enabled: "{prefix} &aPvP &2attivato&a!"
+  # Messaggio inviato durante il delay di disattivazione
+  disabling: "{prefix} &ePvP in disattivazione tra &a{seconds} secondi&e..."
+  # Messaggio inviato quando il delay di disattivazione e' annullato
+  disable-cancelled: "{prefix} &eDisattivazione PvP annullata."
+  # Messaggio inviato quando il PvP e' disattivato
+  disabled: "{prefix} &cPvP &4disattivato&c."
+  # Messaggio inviato quando si cerca di attivare durante il delay di rispawn
+  respawn-delay: "{prefix} &cNon puoi attivare il PvP subito dopo il rispawn. Aspetta qualche secondo."
+  # Messaggio inviato quando si e' in combat tag e si tenta di disattivare
+  combat-tag-cannot-disable: "{prefix} &cSei in combattimento! Attendi la fine del combat tag."
+  # Messaggio inviato all'attaccante se il bersaglio non e' in PvP
+  target-not-in-pvp: "{prefix} &c{target} &7non e' in modalita' PvP."
+  # Messaggio inviato quando si attacca qualcuno senza essere in PvP
+  not-in-pvp: "{prefix} &cDevi attivare il PvP prima di attaccare."
+  # Messaggio al killer
+  kill: "{prefix} &aHai eliminato &c{victim}&a! &7(Kills: &c{kills}&7 | Streak: &6{killstreak}&7)"
+
+# ============================================================
+#  STATISTICHE
+# ============================================================
+stats:
+  # Intestazione del pannello statistiche
+  header: "&8&m                    &r &b{player} &8&m                    "
+  kills: "  &7Kill: &a{kills}"
+  deaths: "  &7Morti: &c{deaths}"
+  kd: "  &7K/D: &e{kd}"
+  killstreak: "  &7Killstreak: &6{killstreak}"
+  best-streak: "  &7Migliore streak: &d{best}"
+  footer: "&8&m                                                  "
+  # Messaggio quando il giocatore non ha statistiche in cache
+  not-found: "{prefix} &cGiocatore &7{player} &cnon trovato."
+  # Messaggio inviato al target quando le sue statistiche vengono azzerate
+  reset-notify: "{prefix} &cLe tue statistiche PvP sono state azzerate da un amministratore."
+
+# ============================================================
+#  ADMIN
+# ============================================================
+admin:
+  # Messaggio dopo il reload
+  reloaded: "{prefix} &aConfigurazione ricaricata con successo."
+  # Messaggio quando si forza l'attivazione
+  force-enable: "{prefix} &aPvP forzatamente &2attivato &aper &2{player}&a."
+  # Messaggio quando si forza la disattivazione
+  force-disable: "{prefix} &cPvP forzatamente &4disattivato &cper &4{player}&c."
+  # Messaggio di reset statistiche
+  stats-reset: "{prefix} &aStatistiche di &2{player} &aazzerate."
+  # Messaggio di aggiornamento disponibile
+  update-available: "{prefix} &eE' disponibile un aggiornamento per HubCore! Scaricalo su GitHub."
