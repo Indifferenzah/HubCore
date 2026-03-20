@@ -12,16 +12,18 @@ import com.indifferenzah.hubcore.plugin.lobbyblocks.LobbyBlocksManager;
 import com.indifferenzah.hubcore.plugin.service.PvPServiceImpl;
 import com.indifferenzah.hubcore.plugin.service.SwordManager;
 import com.indifferenzah.hubcore.plugin.task.AutoSaveTask;
+import com.indifferenzah.hubcore.plugin.util.ColorUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.yaml.snakeyaml.Yaml;
 import revxrsal.commands.bukkit.BukkitLamp;
 
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +48,8 @@ public class HubCorePlugin extends JavaPlugin {
     private String localVersion = "unknown";
     // Flag che indica se e' disponibile un aggiornamento su GitHub
     private boolean updateAvailable = false;
+    // Ultima versione disponibile su GitHub (null se non ancora verificato)
+    private String newestVersion = null;
 
     @Override
     public void onEnable() {
@@ -54,7 +58,7 @@ public class HubCorePlugin extends JavaPlugin {
         // 1. Salva le configurazioni di default se non esistono
         saveDefaultConfig();
         saveResource("messages.yml", false);
-        saveResource("version.yml", false);
+        saveResource("version.yml", false); // crea solo se non esiste
 
         // 2. Crea la cartella dati del plugin se non esiste
         if (!getDataFolder().exists()) {
@@ -154,32 +158,30 @@ public class HubCorePlugin extends JavaPlugin {
     private void checkVersion() {
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             try {
-                // Effettua la richiesta HTTP all'API GitHub
                 String remoteVersion = fetchLatestGitHubVersion();
                 if (remoteVersion == null) {
                     getLogger().warning("[VersionCheck] Impossibile recuperare la versione da GitHub.");
                     return;
                 }
 
-                int comparison = compareSemVer(localVersion, remoteVersion);
-
-                if (comparison > 0) {
-                    // Versione locale più recente di GitHub: build di sviluppo non rilasciata
-                    getLogger().warning("[VersionCheck] Versione locale (" + localVersion + ") "
-                            + "> remota (" + remoteVersion + "): build di sviluppo rilevata.");
-                    Bukkit.getScheduler().runTask(this, () -> {
-                        getLogger().severe("[VersionCheck] Disabilitazione plugin per versione non autorizzata.");
-                        getServer().getPluginManager().disablePlugin(this);
-                    });
-                } else if (comparison < 0) {
+                int cmp = compareSemVer(localVersion, remoteVersion);
+                if (cmp > 0) {
+                    // version.yml ha una versione superiore all'ultima release: disabilita
+                    getLogger().severe("[VersionCheck] Versione non valida: locale (" + localVersion
+                            + ") > ultima release (" + remoteVersion + "). Plugin disabilitato.");
+                    Bukkit.getScheduler().runTask(this,
+                            () -> getServer().getPluginManager().disablePlugin(this));
+                } else if (cmp < 0) {
                     // Aggiornamento disponibile
                     updateAvailable = true;
+                    newestVersion = remoteVersion;
                     getLogger().info("[VersionCheck] Aggiornamento disponibile: v" + remoteVersion
                             + " (corrente: v" + localVersion + ")");
+                    Component updateMsg = buildUpdateMessage(localVersion, remoteVersion);
                     Bukkit.getScheduler().runTask(this, () -> {
                         for (var player : Bukkit.getOnlinePlayers()) {
                             if (player.hasPermission("hubcore.admin")) {
-                                player.sendMessage(messagesLoader.get("admin.update-available"));
+                                player.sendMessage(updateMsg);
                             }
                         }
                     });
@@ -188,9 +190,46 @@ public class HubCorePlugin extends JavaPlugin {
                 }
 
             } catch (Exception e) {
-                getLogger().warning("[VersionCheck] Errore durante la verifica: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+                getLogger().warning("[VersionCheck] Errore: " + e.getClass().getSimpleName() + ": " + e.getMessage());
             }
         });
+    }
+
+    private Component buildUpdateMessage(String current, String newest) {
+        String url = "https://github.com/Indifferenzah/HubCore/releases";
+        return Component.text()
+                .append(ColorUtil.colorize("&8[&bHubCore&8] &6An update is available, current version: &c" + current
+                        + " &6, newest version: &a" + newest + "&6."))
+                .appendNewline()
+                .append(ColorUtil.colorize("&6Download it now: "))
+                .append(Component.text(url)
+                        .color(NamedTextColor.WHITE)
+                        .decorate(TextDecoration.UNDERLINED)
+                        .clickEvent(ClickEvent.openUrl(url)))
+                .build();
+    }
+
+    /** Restituisce il messaggio di update pronto da inviare, o null se non disponibile. */
+    public Component getUpdateMessage() {
+        if (!updateAvailable || newestVersion == null) return null;
+        return buildUpdateMessage(localVersion, newestVersion);
+    }
+
+    private int compareSemVer(String v1, String v2) {
+        String[] p1 = v1.split("\\.");
+        String[] p2 = v2.split("\\.");
+        int len = Math.max(p1.length, p2.length);
+        for (int i = 0; i < len; i++) {
+            int n1 = i < p1.length ? parseIntSafe(p1[i]) : 0;
+            int n2 = i < p2.length ? parseIntSafe(p2[i]) : 0;
+            if (n1 != n2) return n1 - n2;
+        }
+        return 0;
+    }
+
+    private int parseIntSafe(String s) {
+        try { return Integer.parseInt(s.replaceAll("[^0-9]", "")); }
+        catch (NumberFormatException e) { return 0; }
     }
 
     /**
@@ -199,13 +238,14 @@ public class HubCorePlugin extends JavaPlugin {
      * @return La stringa di versione, o null in caso di errore
      */
     private String readLocalVersion() {
-        try (InputStream is = getClass().getResourceAsStream("/version.yml")) {
-            if (is == null) return null;
-            Yaml yaml = new Yaml();
-            Map<String, Object> data = yaml.load(is);
-            if (data == null) return null;
-            Object version = data.get("version");
-            return version != null ? version.toString() : null;
+        // Legge dal data folder (salvato da saveResource a ogni avvio → sempre uguale al JAR)
+        java.io.File file = new java.io.File(getDataFolder(), "version.yml");
+        if (!file.exists()) return null;
+        try {
+            org.bukkit.configuration.file.YamlConfiguration cfg =
+                    org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(file);
+            String v = cfg.getString("version");
+            return (v != null && !v.isBlank()) ? v.trim() : null;
         } catch (Exception e) {
             return null;
         }
@@ -250,35 +290,6 @@ public class HubCorePlugin extends JavaPlugin {
         } catch (Exception e) {
             getLogger().warning("[VersionCheck] Fetch fallito: " + e.getClass().getSimpleName() + ": " + e.getMessage());
             return null;
-        }
-    }
-
-    /**
-     * Confronta due stringhe di versione in formato SemVer (MAJOR.MINOR.PATCH).
-     *
-     * @param v1 Prima versione
-     * @param v2 Seconda versione
-     * @return Negativo se v1 < v2, 0 se uguali, positivo se v1 > v2
-     */
-    private int compareSemVer(String v1, String v2) {
-        String[] parts1 = v1.split("\\.");
-        String[] parts2 = v2.split("\\.");
-        int length = Math.max(parts1.length, parts2.length);
-
-        for (int i = 0; i < length; i++) {
-            int p1 = i < parts1.length ? parseVersionPart(parts1[i]) : 0;
-            int p2 = i < parts2.length ? parseVersionPart(parts2[i]) : 0;
-            if (p1 != p2) return p1 - p2;
-        }
-        return 0;
-    }
-
-    /** Parsa una parte di versione, ignorando i suffissi non numerici (es. "1-SNAPSHOT" → 1). */
-    private int parseVersionPart(String part) {
-        try {
-            return Integer.parseInt(part.replaceAll("[^0-9]", ""));
-        } catch (NumberFormatException e) {
-            return 0;
         }
     }
 

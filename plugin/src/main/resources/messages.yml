@@ -60,5 +60,3 @@ admin:
   force-disable: "{prefix} &cPvP forzatamente &4disattivato &cper &4{player}&c."
   # Messaggio di reset statistiche
   stats-reset: "{prefix} &aStatistiche di &2{player} &aazzerate."
-  # Messaggio di aggiornamento disponibile
-  update-available: "{prefix} &eè disponibile un aggiornamento per HubCore! Scaricalo su GitHub."

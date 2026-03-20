@@ -26,7 +26,8 @@ public class PlayerJoinListener implements Listener {
 
         // Notifica di aggiornamento disponibile (solo agli admin con permesso hubcore.admin)
         if (plugin.isUpdateAvailable() && player.hasPermission("hubcore.admin")) {
-            player.sendMessage(plugin.getMessagesLoader().get("admin.update-available"));
+            net.kyori.adventure.text.Component msg = plugin.getUpdateMessage();
+            if (msg != null) player.sendMessage(msg);
         }
 
         // Delay di 2 tick: altri plugin (es. DeluxeHub) potrebbero sovrascrivere
