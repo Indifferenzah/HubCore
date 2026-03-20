@@ -19,11 +19,15 @@ public class PlayerSwapHandListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
-        // Annulla lo scambio se uno degli oggetti coinvolti e' la spada PvP
+        // Annulla lo scambio se uno degli oggetti coinvolti e' la spada PvP o un item lobby
         boolean mainHandIsSword = plugin.getSwordManager().isPvPSword(event.getMainHandItem());
         boolean offHandIsSword = plugin.getSwordManager().isPvPSword(event.getOffHandItem());
+        boolean mainHandIsLobby = plugin.getLobbyBlocksManager().isBlockItem(event.getMainHandItem())
+                || plugin.getLobbyBlocksManager().isSelectorItem(event.getMainHandItem());
+        boolean offHandIsLobby = plugin.getLobbyBlocksManager().isBlockItem(event.getOffHandItem())
+                || plugin.getLobbyBlocksManager().isSelectorItem(event.getOffHandItem());
 
-        if (mainHandIsSword || offHandIsSword) {
+        if (mainHandIsSword || offHandIsSword || mainHandIsLobby || offHandIsLobby) {
             event.setCancelled(true);
         }
     }

@@ -72,13 +72,13 @@ public class SwordManager {
         ItemMeta meta = sword.getItemMeta();
         if (meta == null) return;
 
-        // Nome colorato
-        meta.displayName(ColorUtil.colorize(name));
+        // Nome colorato (senza corsivo automatico di Minecraft)
+        meta.displayName(ColorUtil.itemName(name));
 
-        // Lore colorata
+        // Lore colorata (senza corsivo automatico di Minecraft)
         List<Component> loreComponents = new ArrayList<>();
         for (String line : lore) {
-            loreComponents.add(ColorUtil.colorize(line));
+            loreComponents.add(ColorUtil.itemName(line));
         }
         meta.lore(loreComponents);
 
@@ -146,10 +146,10 @@ public class SwordManager {
         ItemMeta meta = sword.getItemMeta();
         if (meta == null) return;
 
-        meta.displayName(ColorUtil.colorize(newName));
+        meta.displayName(ColorUtil.itemName(newName));
         List<Component> loreComponents = new ArrayList<>();
         for (String line : newLore) {
-            loreComponents.add(ColorUtil.colorize(line));
+            loreComponents.add(ColorUtil.itemName(line));
         }
         meta.lore(loreComponents);
 

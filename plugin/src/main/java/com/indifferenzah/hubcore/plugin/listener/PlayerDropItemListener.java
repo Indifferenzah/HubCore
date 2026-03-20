@@ -20,9 +20,11 @@ public class PlayerDropItemListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         var item = event.getItemDrop().getItemStack();
-        // Impedisci il drop della spada PvP o dell'armatura PvP
+        // Impedisci il drop della spada PvP, dell'armatura PvP o degli item lobby
         if (plugin.getSwordManager().isPvPSword(item)
-                || plugin.getArmorManager().isPvPArmor(item)) {
+                || plugin.getArmorManager().isPvPArmor(item)
+                || plugin.getLobbyBlocksManager().isBlockItem(item)
+                || plugin.getLobbyBlocksManager().isSelectorItem(item)) {
             event.setCancelled(true);
         }
     }

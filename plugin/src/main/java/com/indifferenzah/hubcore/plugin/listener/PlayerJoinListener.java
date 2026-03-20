@@ -36,6 +36,8 @@ public class PlayerJoinListener implements Listener {
             if (!plugin.getSwordManager().hasSword(player)) {
                 plugin.getSwordManager().giveSword(player);
             }
+            // Consegna l'item lobby blocks (piazza-blocco)
+            plugin.getLobbyBlocksManager().giveItems(player);
             // L'armatura viene data solo quando il PvP viene attivato, non al join
         }, 2L);
     }

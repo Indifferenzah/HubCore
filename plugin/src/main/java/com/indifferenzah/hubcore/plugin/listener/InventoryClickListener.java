@@ -26,10 +26,19 @@ public class InventoryClickListener implements Listener {
         var swordManager = plugin.getSwordManager();
         var armorManager = plugin.getArmorManager();
 
+        var lobbyManager = plugin.getLobbyBlocksManager();
+
         // Blocca qualsiasi click che coinvolge la spada PvP:
         // sia lo slot che la contiene, sia il cursore (drag-and-drop)
         if (swordManager.isPvPSword(event.getCurrentItem())
                 || swordManager.isPvPSword(event.getCursor())) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // Blocca qualsiasi click che coinvolge gli item lobby (blocco o selettore)
+        if (lobbyManager.isBlockItem(event.getCurrentItem()) || lobbyManager.isBlockItem(event.getCursor())
+                || lobbyManager.isSelectorItem(event.getCurrentItem()) || lobbyManager.isSelectorItem(event.getCursor())) {
             event.setCancelled(true);
             return;
         }

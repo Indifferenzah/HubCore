@@ -94,14 +94,14 @@ public class ArmorManager {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
 
-        // Nome
+        // Nome (senza corsivo automatico di Minecraft)
         String name = config.getArmorName(path);
-        meta.displayName(ColorUtil.colorize(name));
+        meta.displayName(ColorUtil.itemName(name));
 
-        // Lore
+        // Lore (senza corsivo automatico di Minecraft)
         List<Component> loreComponents = new ArrayList<>();
         for (String line : config.getArmorLore(path)) {
-            loreComponents.add(ColorUtil.colorize(line));
+            loreComponents.add(ColorUtil.itemName(line));
         }
         if (!loreComponents.isEmpty()) meta.lore(loreComponents);
 

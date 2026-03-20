@@ -28,6 +28,9 @@ public class PlayerQuitListener implements Listener {
         // Rimuove il giocatore dalla gestione PvP (cancella tutti i task)
         plugin.getPvpService().removePlayer(uuid);
 
+        // Rimuove i dati lobby blocks del giocatore (sessioni di rottura, selezione blocco)
+        plugin.getLobbyBlocksManager().removePlayer(uuid);
+
         // Rimuove il giocatore dalla cache statistiche
         plugin.getH2StatsService().unloadPlayer(uuid);
     }

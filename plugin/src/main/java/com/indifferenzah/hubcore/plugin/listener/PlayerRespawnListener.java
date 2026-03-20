@@ -31,6 +31,8 @@ public class PlayerRespawnListener implements Listener {
             if (!plugin.getSwordManager().hasSword(player)) {
                 plugin.getSwordManager().giveSword(player);
             }
+            // Consegna l'item lobby blocks (piazza-blocco) dopo il rispawn
+            plugin.getLobbyBlocksManager().giveItems(player);
             // L'armatura viene data solo quando il PvP viene attivato, non al rispawn
         }, 1L);
     }

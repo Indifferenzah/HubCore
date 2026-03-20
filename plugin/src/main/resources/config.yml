@@ -24,14 +24,14 @@ sword:
     - HIDE_ATTRIBUTES
     - HIDE_ENCHANTS
 
-  # Aspetto quando il PvP e' inattivo
+  # Aspetto quando il PvP è inattivo
   inactive:
     name: "&7Spada PvP &c[OFF]"
     lore:
       - "&8▸ &7Tieni in mano per &cattivare &7il PvP"
       - "&8▸ &7Stato: &cDisattivato"
 
-  # Aspetto quando il PvP e' attivo
+  # Aspetto quando il PvP è attivo
   active:
     name: "&aSpada PvP &2[ON]"
     lore:
@@ -190,3 +190,42 @@ database:
   file: "hubcore_data"
   # Intervallo di salvataggio automatico in SECONDI (300 = 5 minuti)
   save-interval: 300
+
+# ============================================================
+#  LOBBY BLOCKS
+# ============================================================
+lobby-blocks:
+  enabled: true
+
+  # Slot dello stack di blocchi (item che sembra un normale blocco)
+  block-slot: 2
+  # Slot dell'item selettore
+  selector-slot: 6
+  # Blocco di default allo spawn
+  default-block: PURPLE_WOOL
+
+  # Nome dell'item blocco nell'hotbar — {block} viene sostituito con il nome del blocco
+  block-name: "&bBlocchi"
+
+  # Durata in secondi della rottura del blocco
+  break-time: 5
+
+  # Blocchi non piazzabili con il sistema
+  blacklist:
+    - BEDROCK
+    - BARRIER
+    - WATER
+    - LAVA
+    - AIR
+    - VOID_AIR
+    - CAVE_AIR
+
+  # Item selettore (apre il menu blockselector.yml)
+  selector:
+    material: REPEATER
+    name: "&bSelettore Blocchi"
+#    lore:
+    unbreakable: true
+    flags:
+      - HIDE_ATTRIBUTES
+      - HIDE_UNBREAKABLE

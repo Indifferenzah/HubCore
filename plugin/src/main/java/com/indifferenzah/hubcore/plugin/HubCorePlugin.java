@@ -8,6 +8,7 @@ import com.indifferenzah.hubcore.plugin.database.H2StatsService;
 import com.indifferenzah.hubcore.plugin.listener.*;
 import com.indifferenzah.hubcore.plugin.service.ArmorManager;
 import com.indifferenzah.hubcore.plugin.service.EffectManager;
+import com.indifferenzah.hubcore.plugin.lobbyblocks.LobbyBlocksManager;
 import com.indifferenzah.hubcore.plugin.service.PvPServiceImpl;
 import com.indifferenzah.hubcore.plugin.service.SwordManager;
 import com.indifferenzah.hubcore.plugin.task.AutoSaveTask;
@@ -18,6 +19,7 @@ import revxrsal.commands.bukkit.BukkitLamp;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -38,7 +40,10 @@ public class HubCorePlugin extends JavaPlugin {
     private SwordManager swordManager;
     private ArmorManager armorManager;
     private EffectManager effectManager;
+    private LobbyBlocksManager lobbyBlocksManager;
 
+    // Versione letta da version.yml (classpath), usata nel log e nel version check
+    private String localVersion = "unknown";
     // Flag che indica se e' disponibile un aggiornamento su GitHub
     private boolean updateAvailable = false;
 
@@ -60,6 +65,10 @@ public class HubCorePlugin extends JavaPlugin {
         configLoader = new ConfigLoader(this);
         messagesLoader = new MessagesLoader(this);
 
+        // Legge la versione da version.yml (incluso nel JAR) prima di qualsiasi log
+        String v = readLocalVersion();
+        if (v != null) localVersion = v;
+
         // 4. Inizializza il database H2
         statsService = new H2StatsService(this);
 
@@ -68,6 +77,8 @@ public class HubCorePlugin extends JavaPlugin {
         armorManager = new ArmorManager(this);
         effectManager = new EffectManager(this);
         pvpService = new PvPServiceImpl(this);
+        lobbyBlocksManager = new LobbyBlocksManager(this);
+        saveResource("menu/blockselector.yml", false);
 
         // 6. Registra i servizi nell'API pubblica
         HubCoreAPI.setStatsService(statsService);
@@ -86,8 +97,8 @@ public class HubCorePlugin extends JavaPlugin {
         // 10. Verifica la versione in modo asincrono
         checkVersion();
 
-        // 11. Messaggio di avvio nel log
-        getLogger().info("HubCore v" + getDescription().getVersion() + " abilitato con successo.");
+        // 11. Messaggio di avvio nel log (versione letta da version.yml)
+        getLogger().info("HubCore v" + localVersion + " abilitato con successo.");
         getLogger().info("Sviluppato da Indifferenzah con amore.");
     }
 
@@ -120,6 +131,7 @@ public class HubCorePlugin extends JavaPlugin {
         pm.registerEvents(new PlayerDropItemListener(this), this);
         pm.registerEvents(new PlayerSwapHandListener(this), this);
         pm.registerEvents(new InventoryClickListener(this), this);
+        pm.registerEvents(new LobbyBlocksListener(this), this);
     }
 
     /**
@@ -142,37 +154,28 @@ public class HubCorePlugin extends JavaPlugin {
     private void checkVersion() {
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             try {
-                // Legge la versione locale dal file version.yml incluso nel JAR
-                String localVersion = readLocalVersion();
-                if (localVersion == null) {
-                    getLogger().warning("Impossibile leggere la versione locale da version.yml.");
-                    return;
-                }
-
                 // Effettua la richiesta HTTP all'API GitHub
                 String remoteVersion = fetchLatestGitHubVersion();
                 if (remoteVersion == null) {
-                    getLogger().info("Impossibile verificare gli aggiornamenti (nessuna connessione?).");
+                    getLogger().warning("[VersionCheck] Impossibile recuperare la versione da GitHub.");
                     return;
                 }
 
                 int comparison = compareSemVer(localVersion, remoteVersion);
 
                 if (comparison > 0) {
-                    // La versione locale e' piu' recente di quella su GitHub (build di sviluppo)
-                    getLogger().warning("La versione locale (" + localVersion + ") e' piu' recente "
-                            + "di quella su GitHub (" + remoteVersion + "). Build di sviluppo rilevata.");
-                    // Disabilita il plugin sul thread principale
+                    // Versione locale più recente di GitHub: build di sviluppo non rilasciata
+                    getLogger().warning("[VersionCheck] Versione locale (" + localVersion + ") "
+                            + "> remota (" + remoteVersion + "): build di sviluppo rilevata.");
                     Bukkit.getScheduler().runTask(this, () -> {
-                        getLogger().severe("Disabilitazione del plugin per versione non autorizzata.");
+                        getLogger().severe("[VersionCheck] Disabilitazione plugin per versione non autorizzata.");
                         getServer().getPluginManager().disablePlugin(this);
                     });
                 } else if (comparison < 0) {
-                    // E' disponibile una versione piu' recente
+                    // Aggiornamento disponibile
                     updateAvailable = true;
-                    getLogger().info("E' disponibile un aggiornamento: v" + remoteVersion
-                            + " (locale: v" + localVersion + ")");
-                    // Notifica gli admin online
+                    getLogger().info("[VersionCheck] Aggiornamento disponibile: v" + remoteVersion
+                            + " (corrente: v" + localVersion + ")");
                     Bukkit.getScheduler().runTask(this, () -> {
                         for (var player : Bukkit.getOnlinePlayers()) {
                             if (player.hasPermission("hubcore.admin")) {
@@ -181,12 +184,11 @@ public class HubCorePlugin extends JavaPlugin {
                         }
                     });
                 } else {
-                    // Versione aggiornata
-                    getLogger().info("Plugin aggiornato alla versione " + localVersion + ".");
+                    getLogger().info("[VersionCheck] Plugin aggiornato (v" + localVersion + ").");
                 }
 
             } catch (Exception e) {
-                getLogger().info("Verifica aggiornamenti fallita: " + e.getMessage());
+                getLogger().warning("[VersionCheck] Errore durante la verifica: " + e.getClass().getSimpleName() + ": " + e.getMessage());
             }
         });
     }
@@ -216,37 +218,37 @@ public class HubCorePlugin extends JavaPlugin {
      */
     private String fetchLatestGitHubVersion() {
         try {
-            URL url = new URL("https://api.github.com/repos/Indifferenzah/HubCore/releases/latest");
+            URL url = URI.create("https://api.github.com/repos/Indifferenzah/HubCore/releases/latest").toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(5000);
+            conn.setInstanceFollowRedirects(true);
             conn.setRequestProperty("Accept", "application/vnd.github.v3+json");
-            conn.setRequestProperty("User-Agent", "HubCore-Plugin");
+            conn.setRequestProperty("User-Agent", "HubCore-Plugin/" + localVersion);
 
             int responseCode = conn.getResponseCode();
-            if (responseCode != 200) return null;
+            if (responseCode != 200) {
+                getLogger().warning("[VersionCheck] GitHub ha risposto con HTTP " + responseCode
+                        + " (nessuna release pubblicata?).");
+                return null;
+            }
 
-            // Legge la risposta JSON senza dipendenze esterne
             StringBuilder sb = new StringBuilder();
             try (var reader = new java.io.BufferedReader(
                     new java.io.InputStreamReader(conn.getInputStream()))) {
                 String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
+                while ((line = reader.readLine()) != null) sb.append(line);
             }
 
-            // Estrae il tag_name con regex semplice (formato: "tag_name":"v1.0.0")
-            String json = sb.toString();
-            Pattern pattern = Pattern.compile("\"tag_name\"\\s*:\\s*\"v?([^\"]+)\"");
-            Matcher matcher = pattern.matcher(json);
-            if (matcher.find()) {
-                return matcher.group(1).trim();
-            }
+            // Estrae il tag_name — accetta sia "v1.0.0" che "1.0.0"
+            Matcher matcher = Pattern.compile("\"tag_name\"\\s*:\\s*\"v?([^\"]+)\"").matcher(sb);
+            if (matcher.find()) return matcher.group(1).trim();
 
+            getLogger().warning("[VersionCheck] tag_name non trovato nella risposta GitHub.");
             return null;
         } catch (Exception e) {
+            getLogger().warning("[VersionCheck] Fetch fallito: " + e.getClass().getSimpleName() + ": " + e.getMessage());
             return null;
         }
     }
@@ -293,7 +295,10 @@ public class HubCorePlugin extends JavaPlugin {
         reloadConfig();
         messagesLoader.load();
 
-        // 2. Ri-applica spada e armatura a tutti i giocatori online
+        // Ricarica il menu del selettore blocchi (blockselector.yml)
+        lobbyBlocksManager.reload();
+
+        // 2. Ri-applica spada, armatura e item lobby a tutti i giocatori online
         for (var player : getServer().getOnlinePlayers()) {
             boolean inPvP = pvpService.isInPvP(player.getUniqueId());
 
@@ -317,6 +322,9 @@ public class HubCorePlugin extends JavaPlugin {
                 // PvP non attivo: assicura che non ci sia armatura PvP equipaggiata
                 armorManager.removeArmor(player);
             }
+
+            // Ri-consegna gli item lobby blocks con la nuova configurazione
+            lobbyBlocksManager.giveItems(player);
         }
 
         getLogger().info("Configurazione ricaricata.");
@@ -364,5 +372,9 @@ public class HubCorePlugin extends JavaPlugin {
 
     public boolean isUpdateAvailable() {
         return updateAvailable;
+    }
+
+    public LobbyBlocksManager getLobbyBlocksManager() {
+        return lobbyBlocksManager;
     }
 }

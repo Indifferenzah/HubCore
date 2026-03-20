@@ -469,6 +469,77 @@ public class ConfigLoader {
     }
 
     // -------------------------------------------------------------------------
+    // Lobby Blocks
+    // -------------------------------------------------------------------------
+
+    /** Se i lobby blocks sono abilitati. */
+    public boolean isLobbyBlocksEnabled() {
+        return plugin.getConfig().getBoolean("lobby-blocks.enabled", true);
+    }
+
+    /** Slot dello stack di blocchi. */
+    public int getLobbyBlockSlot() {
+        return plugin.getConfig().getInt("lobby-blocks.block-slot", 1);
+    }
+
+    /** Slot dell'item selettore. */
+    public int getLobbySelectorSlot() {
+        return plugin.getConfig().getInt("lobby-blocks.selector-slot", 2);
+    }
+
+    /** Materiale di default dello stack di blocchi. */
+    public String getLobbyDefaultBlock() {
+        return plugin.getConfig().getString("lobby-blocks.default-block", "STONE");
+    }
+
+    /** Template del nome dell'item blocco nell'hotbar ({block} = nome materiale). */
+    public String getLobbyBlockName() {
+        return plugin.getConfig().getString("lobby-blocks.block-name", "&f{block}");
+    }
+
+    /** Secondi che dura l'animazione di rottura prima che il blocco sparisca. */
+    public long getLobbyBreakTime() {
+        return plugin.getConfig().getLong("lobby-blocks.break-time", 5L);
+    }
+
+    /** Blacklist dei blocchi non piazzabili. */
+    public List<String> getLobbyBlacklist() {
+        List<String> list = plugin.getConfig().getStringList("lobby-blocks.blacklist");
+        list.replaceAll(String::toUpperCase);
+        return list;
+    }
+
+    /** Materiale dell'item selettore. */
+    public String getLobbySelectorMaterial() {
+        return plugin.getConfig().getString("lobby-blocks.selector.material", "COMPASS");
+    }
+
+    /** Nome dell'item selettore. */
+    public String getLobbySelectorName() {
+        return plugin.getConfig().getString("lobby-blocks.selector.name", "&b&lSeleziona Blocco");
+    }
+
+    /** Lore dell'item selettore. */
+    public List<String> getLobbySelectorLore() {
+        return plugin.getConfig().getStringList("lobby-blocks.selector.lore");
+    }
+
+    /** Flag dell'item selettore. */
+    public List<ItemFlag> getLobbySelectorFlags() {
+        List<ItemFlag> flags = new ArrayList<>();
+        for (String f : plugin.getConfig().getStringList("lobby-blocks.selector.flags")) {
+            try { flags.add(ItemFlag.valueOf(f.toUpperCase())); }
+            catch (IllegalArgumentException e) { plugin.getLogger().warning("ItemFlag selector non valido: " + f); }
+        }
+        return flags;
+    }
+
+    /** Se il selettore è indistruttibile. */
+    public boolean isLobbySelectorUnbreakable() {
+        return plugin.getConfig().getBoolean("lobby-blocks.selector.unbreakable", true);
+    }
+
+    // -------------------------------------------------------------------------
     // Prefisso
     // -------------------------------------------------------------------------
 

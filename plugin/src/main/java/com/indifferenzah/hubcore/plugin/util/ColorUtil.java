@@ -1,6 +1,7 @@
 package com.indifferenzah.hubcore.plugin.util;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.Map;
@@ -31,6 +32,15 @@ public final class ColorUtil {
         String converted = convertHexColors(text);
         // 2. Deserializza usando il serializer legacy con &
         return LegacyComponentSerializer.legacyAmpersand().deserialize(converted);
+    }
+
+    /**
+     * Come {@link #colorize(String)} ma disabilita esplicitamente il corsivo.
+     * Da usare per i nomi e la lore degli item: Minecraft li mostra in corsivo
+     * per default quando hanno un nome custom.
+     */
+    public static Component itemName(String text) {
+        return colorize(text).decoration(TextDecoration.ITALIC, false);
     }
 
     /**

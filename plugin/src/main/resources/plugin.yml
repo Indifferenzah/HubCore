@@ -4,6 +4,8 @@ main: com.indifferenzah.hubcore.plugin.HubCorePlugin
 api-version: "1.21"
 description: "Plugin PvP per lobby/hub"
 author: Indifferenzah
+softdepend:
+  - ProtocolLib
 
 commands:
   hubcore:

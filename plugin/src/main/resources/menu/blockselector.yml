@@ -1,0 +1,58 @@
+# ============================================================
+#  HubCore - Selettore Blocchi
+#  Configura il menu di selezione del tipo di blocco.
+#  Cliccando un blocco nel menu, lo stack di blocchi nell'hotbar
+#  cambierà materiale (il tempo di rottura/rispawn non cambia).
+# ============================================================
+
+# Titolo del menu (supporta colori &)
+title: "&7Selettore Blocchi"
+
+# Numero di righe (1-6)
+rows: 3
+
+# Filler opzionale per gli slot vuoti
+filler:
+  enabled: false
+  material: GRAY_STAINED_GLASS_PANE
+  name: " "
+
+# Slot del menu (0 = primo slot in alto a sinistra)
+# Ogni slot deve avere "material" (il blocco che verrà dato al click)
+# e opzionalmente "name" e "lore"
+slots:
+  10:
+    material: STONE
+    name: "&7Pietra"
+    lore:
+      - "&8Clicca per selezionare"
+  11:
+    material: GRASS_BLOCK
+    name: "&aErba"
+    lore:
+      - "&8Clicca per selezionare"
+  12:
+    material: DIRT
+    name: "&6Terra"
+    lore:
+      - "&8Clicca per selezionare"
+  13:
+    material: COBBLESTONE
+    name: "&7Pietrisco"
+    lore:
+      - "&8Clicca per selezionare"
+  14:
+    material: OAK_LOG
+    name: "&6Tronco di Quercia"
+    lore:
+      - "&8Clicca per selezionare"
+  15:
+    material: OAK_PLANKS
+    name: "&eAssi di Quercia"
+    lore:
+      - "&8Clicca per selezionare"
+  16:
+    material: SAND
+    name: "&eSabbia"
+    lore:
+      - "&8Clicca per selezionare"
