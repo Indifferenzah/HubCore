@@ -10,4 +10,4 @@
 # ============================================================
 # Versione del plugin — NON modificare manualmente se non sai cosa stai facendo.
 # Il plugin confronta questo valore con il tag piu' recente su GitHub al momento dell'avvio.
-version: "2.0.0"
+version: "2.1.0"

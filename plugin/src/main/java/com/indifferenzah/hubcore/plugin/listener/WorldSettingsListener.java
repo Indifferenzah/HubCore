@@ -97,25 +97,33 @@ public class WorldSettingsListener implements Listener {
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onDrop(PlayerDropItemEvent event) {
         if (!ws("disable_item_drop")) return;
+        // Bypass: hubcore.bypass.item.drop o op
+        if (event.getPlayer().hasPermission("hubcore.bypass.item.drop")) return;
         event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPickup(EntityPickupItemEvent event) {
         if (!ws("disable_item_pickup")) return;
-        if (!(event.getEntity() instanceof Player)) return;
+        if (!(event.getEntity() instanceof Player player)) return;
+        // Bypass: hubcore.bypass.item.pickup o op
+        if (player.hasPermission("hubcore.bypass.item.pickup")) return;
         event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
         if (!ws("disable_block_break")) return;
+        // Bypass: hubcore.bypass.block.break o op
+        if (event.getPlayer().hasPermission("hubcore.bypass.block.break")) return;
         event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent event) {
         if (!ws("disable_block_place")) return;
+        // Bypass: hubcore.bypass.block.place o op
+        if (event.getPlayer().hasPermission("hubcore.bypass.block.place")) return;
         // Permetti i blocchi lobby (gestiti da LobbyBlocksListener a MONITOR)
         if (plugin.getLobbyBlocksManager().isBlockItem(event.getItemInHand())) return;
         event.setCancelled(true);
@@ -127,6 +135,8 @@ public class WorldSettingsListener implements Listener {
         var action = event.getAction();
         if (action != org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK
                 && action != org.bukkit.event.block.Action.LEFT_CLICK_BLOCK) return;
+        // Bypass: hubcore.bypass.block.interact o op
+        if (event.getPlayer().hasPermission("hubcore.bypass.block.interact")) return;
         // Non cancellare se è il selettore o il blocco lobby
         var item = event.getPlayer().getInventory().getItemInMainHand();
         if (plugin.getLobbyBlocksManager().isBlockItem(item)

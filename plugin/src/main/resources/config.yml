@@ -287,7 +287,7 @@ world_settings:
 
 # ============================================================
 #  JOIN / LEAVE MESSAGES
-#  Se il giocatore ha hubcore.announce.join/.announce.leave
+#  Se il giocatore ha hubcore.announce.join/.leave
 #  il messaggio viene mostrato a tutti, altrimenti è nascosto.
 # ============================================================
 join_leave_messages:

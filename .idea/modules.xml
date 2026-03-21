@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/HubCore.iml" filepath="$PROJECT_DIR$/.idea/modules/HubCore.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/api/HubCore.api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/api/HubCore.api.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/plugin/HubCore.plugin.main.iml" filepath="$PROJECT_DIR$/.idea/modules/plugin/HubCore.plugin.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/HubCore.iml" filepath="$PROJECT_DIR$/.idea/HubCore.iml" />
     </modules>
   </component>
 </project>

@@ -1,6 +1,7 @@
 package com.indifferenzah.hubcore.plugin.util;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -59,6 +60,22 @@ public final class ColorUtil {
     }
 
     /**
+     * Versione specializzata per i nametag Scoreboard (prefix/suffix dei team).
+     * Normalizza sia i codici & che § in § e usa legacySection() per deserializzare,
+     * cosi' funziona indipendentemente da come LuckPerms/PAPI restituiscono i colori.
+     *
+     * @param text Il testo (puo' contenere & o § indifferentemente)
+     * @return Il Component risultante
+     */
+    public static Component colorizeNametag(String text) {
+        if (text == null) return Component.empty();
+        // Normalizza: converte &#rrggbb → §x§r§r§g§g§b§b, poi & → §
+        // Cosi' gestisce sia il formato & (config) che § (LuckPerms/PAPI)
+        String sectionFormat = colorizeString(text);
+        return LegacyComponentSerializer.legacySection().deserialize(sectionFormat);
+    }
+
+    /**
      * Sostituisce i segnaposto nella forma {chiave} con i valori forniti.
      *
      * @param text         Il testo contenente i segnaposto
@@ -74,6 +91,55 @@ public final class ColorUtil {
             text = text.replace("{" + entry.getKey() + "}", entry.getValue());
         }
         return text;
+    }
+
+    /**
+     * Estrae l'ultimo codice colore legacy (§X) da una stringa gia' in formato §.
+     * Usato per impostare il colore del nome del giocatore nel team Scoreboard,
+     * replicando il comportamento legacy dove l'ultimo colore del prefisso
+     * "sanguina" nel nome del giocatore.
+     *
+     * @param sectionText Testo con codici §
+     * @return L'ultimo NamedTextColor trovato, WHITE se nessun codice valido
+     */
+    public static NamedTextColor extractLastColor(String sectionText) {
+        if (sectionText == null || sectionText.isEmpty()) return NamedTextColor.WHITE;
+        NamedTextColor last = NamedTextColor.WHITE;
+        for (int i = 0; i < sectionText.length() - 1; i++) {
+            if (sectionText.charAt(i) == '\u00A7') {
+                char code = Character.toLowerCase(sectionText.charAt(i + 1));
+                if (code == 'r') {
+                    last = NamedTextColor.WHITE; // reset
+                } else {
+                    NamedTextColor c = legacyCodeToColor(code);
+                    if (c != null) last = c;
+                }
+            }
+        }
+        return last;
+    }
+
+    /** Mappa codice legacy (0-9, a-f) → NamedTextColor. Null per codici non-colore (l, n, o, ...). */
+    private static NamedTextColor legacyCodeToColor(char code) {
+        return switch (code) {
+            case '0' -> NamedTextColor.BLACK;
+            case '1' -> NamedTextColor.DARK_BLUE;
+            case '2' -> NamedTextColor.DARK_GREEN;
+            case '3' -> NamedTextColor.DARK_AQUA;
+            case '4' -> NamedTextColor.DARK_RED;
+            case '5' -> NamedTextColor.DARK_PURPLE;
+            case '6' -> NamedTextColor.GOLD;
+            case '7' -> NamedTextColor.GRAY;
+            case '8' -> NamedTextColor.DARK_GRAY;
+            case '9' -> NamedTextColor.BLUE;
+            case 'a' -> NamedTextColor.GREEN;
+            case 'b' -> NamedTextColor.AQUA;
+            case 'c' -> NamedTextColor.RED;
+            case 'd' -> NamedTextColor.LIGHT_PURPLE;
+            case 'e' -> NamedTextColor.YELLOW;
+            case 'f' -> NamedTextColor.WHITE;
+            default  -> null; // formato, non colore (es. &l, &n, &o)
+        };
     }
 
     /**

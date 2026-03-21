@@ -37,6 +37,15 @@ tablist-name-formatting:
   enabled: true
   format: '{lp_prefix}%player%{lp_suffix}'
 
+# ─── Nametag sopra la testa ──────────────────────────────────
+# Mostra prefisso/suffisso sopra la testa dei giocatori usando team Scoreboard.
+# Supporta {lp_prefix}, {lp_suffix} e tutti i placeholder di PlaceholderAPI.
+# I team vengono ordinati per gruppo (come la tablist) se group-sorting è abilitato.
+nametag:
+  enabled: true
+  prefix: "{lp_prefix}"
+  suffix: "{lp_suffix}"
+
 # ─── Ordinamento per gruppo ──────────────────────────────────
 # I gruppi vengono ordinati dall'alto verso il basso nella tablist
 # Usa i nomi dei gruppi di LuckPerms

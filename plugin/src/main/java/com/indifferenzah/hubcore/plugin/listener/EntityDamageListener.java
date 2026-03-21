@@ -21,7 +21,10 @@ public class EntityDamageListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    // ignoreCancelled = false (default) e' intenzionale: questo handler deve girare
+    // anche quando WorldSettingsListener (LOW) o WorldGuard hanno gia' cancellato
+    // l'evento, cosi' puo' ri-abilitare il danno quando entrambi i giocatori sono in PvP.
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         // Controlla che la vittima sia un giocatore
         if (!(event.getEntity() instanceof Player victim)) return;
@@ -39,7 +42,7 @@ public class EntityDamageListener implements Listener {
         boolean victimInPvP = pvpService.isInPvP(victim.getUniqueId());
 
         // -----------------------------------------------------------------------
-        // Nessuno dei due e' in PvP: cancella l'evento
+        // Nessuno dei due e' in PvP: assicura che l'evento sia cancellato
         // -----------------------------------------------------------------------
         if (!attackerInPvP && !victimInPvP) {
             event.setCancelled(true);
@@ -64,8 +67,11 @@ public class EntityDamageListener implements Listener {
         }
 
         // -----------------------------------------------------------------------
-        // Entrambi sono in PvP: gestisce il combattimento
+        // Entrambi sono in PvP con la spada attivata: permetti il danno.
+        // Re-abilita esplicitamente nel caso WorldGuard / WorldSettingsListener
+        // avessero gia' cancellato l'evento a priorita' piu' bassa.
         // -----------------------------------------------------------------------
+        event.setCancelled(false);
 
         // Aggiorna il combat tag per entrambi
         pvpService.updateCombatTag(attacker, victim);

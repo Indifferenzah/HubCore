@@ -54,3 +54,18 @@ permissions:
   hubcore.admin:
     description: Permesso admin generico (es. notifiche di aggiornamento)
     default: op
+  hubcore.bypass.item.drop:
+    description: Bypassa disable_item_drop — il giocatore può droppare item
+    default: op
+  hubcore.bypass.item.pickup:
+    description: Bypassa disable_item_pickup — il giocatore può raccogliere item
+    default: op
+  hubcore.bypass.block.break:
+    description: Bypassa disable_block_break — il giocatore può rompere blocchi
+    default: op
+  hubcore.bypass.block.place:
+    description: Bypassa disable_block_place — il giocatore può piazzare blocchi
+    default: op
+  hubcore.bypass.block.interact:
+    description: Bypassa disable_block_interact — il giocatore può interagire con blocchi
+    default: op

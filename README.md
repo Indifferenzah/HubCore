@@ -25,6 +25,7 @@ It provides a complete PvP system, interactive lobby utilities, animated tab/sco
 
 ### ⚔️ PvP System
 - **Sword-based activation** — PvP enables when the player holds the PvP sword, disables when they put it away
+- **Mutual PvP** — damage is only dealt when both players have PvP active (sword equipped and state ACTIVE/COMBAT_TAG)
 - **Configurable sword** — material, name, lore, enchants, flags, glow, unbreakable, active/inactive appearance
 - **Combat tag** — PvP stays active for a configurable duration after the last hit dealt/received
 - **Enable/disable delays** — configurable tick delays before PvP activates or deactivates
@@ -34,8 +35,9 @@ It provides a complete PvP system, interactive lobby utilities, animated tab/sco
 - **Killstreak system** — tracks current and best killstreak; configurable milestone broadcasts with sounds
 - **Kill feed** — customizable kill announcements in chat, action bar, or bossbar
 - **Visual effects** — particles and sounds on kill, PvP enable, and PvP disable (all configurable)
-- **WorldGuard bypass** — PvP works inside protected regions
-- **Inventory keep on death** — no item or XP drops; sword is re-given on respawn
+- **WorldGuard bypass** — PvP correctly bypasses `disable_player_pvp` and WorldGuard region protection
+- **Inventory keep on death** — no item or XP drops; sword, hotbar items, and player hider are re-given on respawn
+- **Respawn at lobby spawn** — players respawn at the configured `/setlobby` location after PvP death
 - **Indroppable sword** — players cannot drop or swap the PvP sword to offhand
 
 ### 📊 PvP Stats (H2 + HikariCP)
@@ -53,9 +55,17 @@ It provides a complete PvP system, interactive lobby utilities, animated tab/sco
 
 ### 🏃 Movement Utilities
 - **Double jump** — configurable with sound, cooldown, and permission
-- **Launchpad** — pressure-plate-based launch pads with configurable velocity
+- **Launchpad** — pressure-plate-based launch pads with configurable velocity; works regardless of the item held in hand
 - **Lobby & spawn** — `/lobby` and `/spawn` commands with configurable locations (stored in H2)
 - **Fly command** — `/fly` to toggle flight (`hubcore.alias.default.fly`)
+
+### 🏷️ Nametags
+- **Above-head nametags** — per-player Scoreboard teams show prefix and suffix above the player's head
+- **LuckPerms integration** — uses `{lp_prefix}` and `{lp_suffix}` directly from the LuckPerms API
+- **PlaceholderAPI support** — any PAPI placeholder can be used in prefix/suffix format
+- **Color bleed** — the last color code in the prefix automatically colors the player name (replicates legacy behavior)
+- **Live updates** — nametags refresh every `update-interval` ticks; handles rank changes mid-session
+- **Configurable format** — `nametag.prefix` and `nametag.suffix` in `tab.yml`; can be disabled independently of the tab list
 
 ### 📋 Animated Tab & Scoreboard
 - **Centralized animations** — all animations defined once in `animations.yml`, shared and synchronized between tab and scoreboard
@@ -156,9 +166,9 @@ All actions support `%player%` as a placeholder.
 
 ```
 plugins/HubCore/
-├── config.yml          — Main configuration (PvP, lobby blocks, effects, …)
+├── config.yml          — Main configuration (PvP, lobby blocks, world settings, effects, …)
 ├── messages.yml        — All player-facing messages
-├── tab.yml             — Tab header/footer, name format, group sorting
+├── tab.yml             — Tab header/footer, name format, group sorting, nametags
 ├── scoreboard.yml      — Sidebar title and lines
 ├── animations.yml      — Shared animations (%animation:Name%) for tab & scoreboard
 ├── aliases.yml         — Custom command aliases
@@ -183,6 +193,25 @@ plugins/HubCore/
 
 **Requirements:** Paper 1.21.1 · Java 21
 **Soft dependencies:** PlaceholderAPI · LuckPerms · ProtocolLib
+
+---
+
+## 🔑 Permissions
+
+| Permission | Default | Description |
+|---|---|---|
+| `hubcore.admin` | op | Admin access (force PvP, reload, update notifications) |
+| `hubcore.set` | op | Set the lobby/spawn location |
+| `hubcore.spawn` | true | Use `/lobby` and `/spawn` |
+| `hubcore.pvp.stats` | true | View PvP statistics |
+| `hubcore.pvp.reset` | op | Reset a player's PvP statistics |
+| `hubcore.bypass.block.break` | op | Bypass `disable_block_break` world setting |
+| `hubcore.bypass.block.place` | op | Bypass `disable_block_place` world setting |
+| `hubcore.bypass.block.interact` | op | Bypass `disable_block_interact` world setting |
+| `hubcore.bypass.item.drop` | op | Bypass `disable_item_drop` world setting |
+| `hubcore.bypass.item.pickup` | op | Bypass `disable_item_pickup` world setting |
+
+All `hubcore.bypass.*` permissions are granted to OPs by default.
 
 ---
 
@@ -241,6 +270,32 @@ clearinventory:
   actions:
     - '[CONSOLE] minecraft:clear %player%'
     - '[MESSAGE] &aInventory cleared!'
+```
+
+</details>
+
+<details>
+<summary>tab.yml — nametag configuration</summary>
+
+```yaml
+nametag:
+  enabled: true
+  prefix: "{lp_prefix}&7"   # supports {lp_prefix}, {lp_suffix}, any PAPI placeholder, & and § color codes
+  suffix: "{lp_suffix}"      # last color in prefix bleeds into the player name automatically
+```
+
+</details>
+
+<details>
+<summary>config.yml — world settings bypass</summary>
+
+```yaml
+world_settings:
+  disable_block_break: true    # bypass: hubcore.bypass.block.break
+  disable_block_place: true    # bypass: hubcore.bypass.block.place
+  disable_block_interact: true # bypass: hubcore.bypass.block.interact
+  disable_item_drop: true      # bypass: hubcore.bypass.item.drop
+  disable_item_pickup: true    # bypass: hubcore.bypass.item.pickup
 ```
 
 </details>

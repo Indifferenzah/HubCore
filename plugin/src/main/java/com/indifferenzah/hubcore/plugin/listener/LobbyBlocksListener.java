@@ -69,12 +69,14 @@ public class LobbyBlocksListener implements Listener {
 
         // --- ITEM SELETTORE ---
         if (manager.isSelectorItem(item)) {
-            event.setCancelled(true);
-            // Apri il menu al tick successivo: aprire l'inventario dentro PlayerInteractEvent
-            // nello stesso tick del pacchetto di interazione può causare la chiusura immediata
-            // dell'inventario lato client in Paper 1.21+
+            // Non cancellare PHYSICAL: calpestare piastre/launchpad deve restare funzionante
+            // anche quando il selettore è in mano.
             if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK
                     || action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
+                event.setCancelled(true);
+                // Apri il menu al tick successivo: aprire l'inventario dentro PlayerInteractEvent
+                // nello stesso tick del pacchetto di interazione può causare la chiusura immediata
+                // dell'inventario lato client in Paper 1.21+
                 plugin.getServer().getScheduler().runTask(plugin, () -> manager.openSelector(player));
             }
         }

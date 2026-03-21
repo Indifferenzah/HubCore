@@ -21,21 +21,34 @@ public class PlayerRespawnListener implements Listener {
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         var player = event.getPlayer();
 
+        // Imposta il punto di respawn allo spawn configurato con /setlobby
+        org.bukkit.Location lobbyLoc = plugin.getH2StatsService().getLobbyLocation();
+        if (lobbyLoc != null) {
+            event.setRespawnLocation(lobbyLoc);
+        }
+
         // Applica il delay di rispawn: il giocatore non puo' attivare il PvP per un certo periodo
         plugin.getPvpService().applyRespawnDelay(player.getUniqueId());
 
         // Re-abilita double jump dopo il rispawn
         plugin.getDoubleJumpListener().enableFor(player);
 
-        // Consegna spada e armatura PvP dopo il rispawn
-        // Piccolo delay per assicurarsi che l'inventario sia pronto
+        // Riconsegna tutti gli item dopo il rispawn con un piccolo delay
+        // per assicurarsi che l'inventario sia pronto lato server
         org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (!player.isOnline()) return;
+
+            // Spada PvP
             if (!plugin.getSwordManager().hasSword(player)) {
                 plugin.getSwordManager().giveSword(player);
             }
-            // Consegna l'item lobby blocks (piazza-blocco) dopo il rispawn
+            // Blocchi lobby (blocco + selettore/bussola)
             plugin.getLobbyBlocksManager().giveItems(player);
+            // Item custom (server selector, ecc.)
+            plugin.getCustomJoinItemsManager().giveItems(player);
+            // Item visibilità giocatori
+            plugin.getPlayerHiderManager().giveItem(player);
+
             // L'armatura viene data solo quando il PvP viene attivato, non al rispawn
         }, 1L);
     }
