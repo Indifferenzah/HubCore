@@ -1,0 +1,45 @@
+# ============================================================
+#   _    _       _      _____
+#  | |  | |     | |    / ____|
+#  | |__| |_   _| |__ | |     ___  _ __ ___
+#  |  __  | | | | '_ \| |    / _ \| '__/ _ \
+#  | |  | | |_| | |_) | |___| (_) | | |  __/
+#  |_|  |_|\__,_|_.__/ \_____\___/|_|  \___|
+#
+#  Sviluppato da Indifferenzah
+# ┌─────────────────────────────────────────────┐
+# │               animations.yml                │
+# └─────────────────────────────────────────────┘
+# Definisci qui tutte le animazioni condivise tra tab.yml e scoreboard.yml.
+# Usale nei file di config con il placeholder: %animation:NomeAnimazione%
+#
+# Formato:
+#   NomeAnimazione:
+#     change-interval: 200   # ms tra un frame e l'altro
+#     texts:
+#       - "&cFrame 1"
+#       - "&aFrame 2"
+# ============================================================
+
+Lalaland:
+  change-interval: 200
+  texts:
+    - '&#9c3ae4&lL&#a64dff&lA&#b35eff&lL&#9c3ae4&lA&#a64dff&lL&#b35eff&lA&#9c3ae4&lN&#a64dff&lD'
+    - '&#a64dff&lL&#b35eff&lA&#c084ff&lL&#a64dff&lA&#b35eff&lL&#c084ff&lA&#a64dff&lN&#b35eff&lD'
+    - '&#b35eff&lL&#c084ff&lA&#d4b8ff&lL&#b35eff&lA&#c084ff&lL&#d4b8ff&lA&#b35eff&lN&#c084ff&lD'
+    - '&#c084ff&lL&#d4b8ff&lA&#e0b3ff&lL&#c084ff&lA&#d4b8ff&lL&#e0b3ff&lA&#c084ff&lN&#d4b8ff&lD'
+    - '&#d4b8ff&lL&#e0b3ff&lA&#c084ff&lL&#d4b8ff&lA&#e0b3ff&lL&#c084ff&lA&#d4b8ff&lN&#e0b3ff&lD'
+    - '&#e0b3ff&lL&#c084ff&lA&#b35eff&lL&#e0b3ff&lA&#c084ff&lL&#b35eff&lA&#e0b3ff&lN&#c084ff&lD'
+    - '&#c084ff&lL&#b35eff&lA&#a64dff&lL&#c084ff&lA&#b35eff&lL&#a64dff&lA&#c084ff&lN&#b35eff&lD'
+    - '&#b35eff&lL&#a64dff&lA&#9c3ae4&lL&#b35eff&lA&#a64dff&lL&#9c3ae4&lA&#b35eff&lN&#a64dff&lD'
+
+rainbow:
+  change-interval: 150
+  texts:
+    - "&c⬛ &6⬛ &e⬛ &a⬛ &b⬛ &9⬛ &d⬛"
+    - "&d⬛ &c⬛ &6⬛ &e⬛ &a⬛ &b⬛ &9⬛"
+    - "&9⬛ &d⬛ &c⬛ &6⬛ &e⬛ &a⬛ &b⬛"
+    - "&b⬛ &9⬛ &d⬛ &c⬛ &6⬛ &e⬛ &a⬛"
+    - "&a⬛ &b⬛ &9⬛ &d⬛ &c⬛ &6⬛ &e⬛"
+    - "&e⬛ &a⬛ &b⬛ &9⬛ &d⬛ &c⬛ &6⬛"
+    - "&6⬛ &e⬛ &a⬛ &b⬛ &9⬛ &d⬛ &c⬛"

@@ -1,0 +1,7 @@
+clearinventory:
+  permission: hubcore.commands.clearinventory
+  aliases:
+    - ci
+  actions:
+    - '[CONSOLE] minecraft:clear %player%'
+    - '[MESSAGE] &aInventario svuotato!'

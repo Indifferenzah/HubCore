@@ -5,6 +5,8 @@ import com.indifferenzah.hubcore.api.service.StatsService;
 import com.indifferenzah.hubcore.plugin.HubCorePlugin;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 
 import java.io.File;
 import java.sql.*;
@@ -23,12 +25,15 @@ public class H2StatsService implements StatsService {
 
     // Cache in memoria: UUID → PlayerData
     private final Map<UUID, PlayerData> cache = new ConcurrentHashMap<>();
+    // Lobby spawn location (cached, null se non ancora impostata)
+    private Location lobbyLocation;
 
     public H2StatsService(HubCorePlugin plugin) {
         this.plugin = plugin;
-        // Inizializza il pool di connessioni e la tabella
         initDataSource();
         createTable();
+        createLobbyTable();
+        lobbyLocation = loadLobbyLocation();
     }
 
     /**
@@ -212,6 +217,71 @@ public class H2StatsService implements StatsService {
             ps.executeUpdate();
         }
     }
+
+    // -------------------------------------------------------------------------
+    // Lobby Location
+    // -------------------------------------------------------------------------
+
+    private void createLobbyTable() {
+        String sql = """
+                CREATE TABLE IF NOT EXISTS lobby_location (
+                    id    INT          DEFAULT 1 NOT NULL PRIMARY KEY,
+                    world VARCHAR(64)  NOT NULL,
+                    x     DOUBLE       NOT NULL,
+                    y     DOUBLE       NOT NULL,
+                    z     DOUBLE       NOT NULL,
+                    yaw   FLOAT        NOT NULL,
+                    pitch FLOAT        NOT NULL
+                )
+                """;
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Errore nella creazione della tabella lobby_location: " + e.getMessage());
+        }
+    }
+
+    public void setLobbyLocation(Location loc) {
+        String sql = """
+                MERGE INTO lobby_location (id, world, x, y, z, yaw, pitch)
+                KEY(id) VALUES (1, ?, ?, ?, ?, ?, ?)
+                """;
+        try (Connection conn = dataSource.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, loc.getWorld().getName());
+            ps.setDouble(2, loc.getX());
+            ps.setDouble(3, loc.getY());
+            ps.setDouble(4, loc.getZ());
+            ps.setFloat(5, loc.getYaw());
+            ps.setFloat(6, loc.getPitch());
+            ps.executeUpdate();
+            lobbyLocation = loc.clone();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Errore nel salvataggio della lobby location: " + e.getMessage());
+        }
+    }
+
+    public Location getLobbyLocation() {
+        return lobbyLocation;
+    }
+
+    private Location loadLobbyLocation() {
+        String sql = "SELECT world, x, y, z, yaw, pitch FROM lobby_location WHERE id = 1";
+        try (Connection conn = dataSource.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    var world = Bukkit.getWorld(rs.getString("world"));
+                    if (world == null) return null;
+                    return new Location(world, rs.getDouble("x"), rs.getDouble("y"),
+                            rs.getDouble("z"), rs.getFloat("yaw"), rs.getFloat("pitch"));
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().warning("Impossibile caricare la lobby location: " + e.getMessage());
+        }
+        return null;
+    }
+
+    // -------------------------------------------------------------------------
 
     /** Aggiorna il nome del giocatore nel database. */
     private void updateName(Connection conn, UUID uuid, String name) throws SQLException {

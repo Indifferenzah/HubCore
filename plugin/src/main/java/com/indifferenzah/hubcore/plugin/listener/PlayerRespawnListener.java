@@ -24,6 +24,9 @@ public class PlayerRespawnListener implements Listener {
         // Applica il delay di rispawn: il giocatore non puo' attivare il PvP per un certo periodo
         plugin.getPvpService().applyRespawnDelay(player.getUniqueId());
 
+        // Re-abilita double jump dopo il rispawn
+        plugin.getDoubleJumpListener().enableFor(player);
+
         // Consegna spada e armatura PvP dopo il rispawn
         // Piccolo delay per assicurarsi che l'inventario sia pronto
         org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {

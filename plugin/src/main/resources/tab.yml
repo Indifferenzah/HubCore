@@ -1,0 +1,48 @@
+# ============================================================
+#   _    _       _      _____
+#  | |  | |     | |    / ____|
+#  | |__| |_   _| |__ | |     ___  _ __ ___
+#  |  __  | | | | '_ \| |    / _ \| '__/ _ \
+#  | |  | | |_| | |_) | |___| (_) | | |  __/
+#  |_|  |_|\__,_|_.__/ \_____\___/|_|  \___|
+#
+#  Sviluppato da Indifferenzah
+#  Header/Footer e formattazione tablist
+#  Supporta PlaceholderAPI, LuckPerms e animazioni
+# ============================================================
+
+enabled: true
+
+# Intervallo di aggiornamento in ticks (20 = 1 secondo)
+update-interval: 5
+
+# ─── Header / Footer ─────────────────────────────────────────
+header-footer:
+  enabled: true
+  header:
+    - '&#9c3ae4&m                                                '
+    - ''
+    - '%animation:Lalaland%'
+    - ''
+  footer:
+    - ''
+    - '&#d4b8ffᴛɪ ᴛʀᴏᴠɪ ɪɴ ʜᴜʙ ɪɴꜱɪᴇᴍᴇ ᴀ &#c084ff%online% &#d4b8ffᴘʟᴀʏᴇʀ'
+    - ''
+    - '&#9c3ae4&m                                                '
+
+# ─── Nome nella tablist ──────────────────────────────────────
+# Placeholder supportati: %player%, {lp_prefix}, {lp_suffix}
+# Oltre a tutti i placeholder di PlaceholderAPI se installato
+tablist-name-formatting:
+  enabled: true
+  format: '{lp_prefix}%player%{lp_suffix}'
+
+# ─── Ordinamento per gruppo ──────────────────────────────────
+# I gruppi vengono ordinati dall'alto verso il basso nella tablist
+# Usa i nomi dei gruppi di LuckPerms
+group-sorting:
+  enabled: true
+  groups:
+    - megaop
+    - op
+    - default

@@ -6,6 +6,8 @@ description: "Plugin PvP per lobby/hub"
 author: Indifferenzah
 softdepend:
   - ProtocolLib
+  - PlaceholderAPI
+  - LuckPerms
 
 commands:
   hubcore:
@@ -14,6 +16,18 @@ commands:
   pvp:
     description: Comandi PvP
     usage: /pvp <stats|reset> [giocatore]
+  setlobby:
+    description: Imposta lo spawn della lobby
+    usage: /setlobby
+  setspawn:
+    description: Imposta lo spawn della lobby (alias di /setlobby)
+    usage: /setspawn
+  lobby:
+    description: Teletrasporta allo spawn della lobby
+    usage: /lobby
+  spawn:
+    description: Teletrasporta allo spawn della lobby (alias di /lobby)
+    usage: /spawn
 
 permissions:
   hubcore.reload:
@@ -24,4 +38,19 @@ permissions:
     default: true
   hubcore.pvp.reset:
     description: Permesso per azzerare le statistiche PvP
+    default: op
+  hubcore.set:
+    description: Permesso per impostare lo spawn con /setlobby e /setspawn
+    default: op
+  hubcore.spawn:
+    description: Permesso per usare /lobby e /spawn
+    default: true
+  hubcore.announce.join:
+    description: Se il giocatore ha questo permesso, il suo join è visibile a tutti
+    default: true
+  hubcore.announce.leave:
+    description: Se il giocatore ha questo permesso, il suo quit è visibile a tutti
+    default: true
+  hubcore.admin:
+    description: Permesso admin generico (es. notifiche di aggiornamento)
     default: op

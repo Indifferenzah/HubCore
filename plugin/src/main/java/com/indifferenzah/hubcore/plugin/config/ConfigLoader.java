@@ -540,6 +540,63 @@ public class ConfigLoader {
     }
 
     // -------------------------------------------------------------------------
+    // Launchpad
+    // -------------------------------------------------------------------------
+
+    public boolean isLaunchpadEnabled()         { return plugin.getConfig().getBoolean("launchpad.enabled", true); }
+    public double getLaunchpadPower()            { return plugin.getConfig().getDouble("launchpad.launch_power", 20.0); }
+    public double getLaunchpadPowerY()           { return plugin.getConfig().getDouble("launchpad.launch_power_y", 1.5); }
+    public String getLaunchpadTopBlock()         { return plugin.getConfig().getString("launchpad.top_block", "LIGHT_WEIGHTED_PRESSURE_PLATE"); }
+    public String getLaunchpadBottomBlock()      { return plugin.getConfig().getString("launchpad.bottom_block", "POLISHED_DIORITE"); }
+    public List<String> getLaunchpadActions()    { return plugin.getConfig().getStringList("launchpad.actions"); }
+
+    // -------------------------------------------------------------------------
+    // Double Jump
+    // -------------------------------------------------------------------------
+
+    public boolean isDoubleJumpEnabled()         { return plugin.getConfig().getBoolean("double_jump.enabled", true); }
+    public double getDoubleJumpPower()           { return plugin.getConfig().getDouble("double_jump.launch_power", 1.0); }
+    public double getDoubleJumpPowerY()          { return plugin.getConfig().getDouble("double_jump.launch_power_y", 0.9); }
+    public int getDoubleJumpCooldown()           { return plugin.getConfig().getInt("double_jump.cooldown", 3); }
+    public List<String> getDoubleJumpActions()   { return plugin.getConfig().getStringList("double_jump.actions"); }
+
+    // -------------------------------------------------------------------------
+    // World Settings
+    // -------------------------------------------------------------------------
+
+    public boolean ws(String key) { return plugin.getConfig().getBoolean("world_settings." + key, false); }
+
+    // -------------------------------------------------------------------------
+    // Join/Leave Messages
+    // -------------------------------------------------------------------------
+
+    public boolean isJoinLeaveEnabled()  { return plugin.getConfig().getBoolean("join_leave_messages.enabled", true); }
+    public String getJoinMessage()       { return plugin.getConfig().getString("join_leave_messages.join_message", ""); }
+    public String getQuitMessage()       { return plugin.getConfig().getString("join_leave_messages.quit_message", ""); }
+
+    // -------------------------------------------------------------------------
+    // Join Events
+    // -------------------------------------------------------------------------
+
+    public List<String> getJoinEvents()  { return plugin.getConfig().getStringList("join_events"); }
+
+    // -------------------------------------------------------------------------
+    // Join Settings
+    // -------------------------------------------------------------------------
+
+    public boolean isSpawnJoin()         { return plugin.getConfig().getBoolean("join_settings.spawn_join", true); }
+    public boolean isJoinHeal()          { return plugin.getConfig().getBoolean("join_settings.heal", true); }
+    public boolean isJoinExtinguish()    { return plugin.getConfig().getBoolean("join_settings.extinguish", true); }
+    public boolean isJoinClearInventory(){ return plugin.getConfig().getBoolean("join_settings.clear_inventory", false); }
+    public boolean isFireworkEnabled()   { return plugin.getConfig().getBoolean("join_settings.firework.enabled", true); }
+    public boolean isFireworkFirstJoinOnly() { return plugin.getConfig().getBoolean("join_settings.firework.first_join_only", true); }
+    public String getFireworkType()      { return plugin.getConfig().getString("join_settings.firework.type", "BALL_LARGE"); }
+    public int getFireworkPower()        { return plugin.getConfig().getInt("join_settings.firework.power", 1); }
+    public boolean isFireworkFlicker()   { return plugin.getConfig().getBoolean("join_settings.firework.flicker", true); }
+    public boolean isFireworkTrail()     { return plugin.getConfig().getBoolean("join_settings.firework.trail", true); }
+    public List<String> getFireworkColors() { return plugin.getConfig().getStringList("join_settings.firework.colors"); }
+
+    // -------------------------------------------------------------------------
     // Prefisso
     // -------------------------------------------------------------------------
 

@@ -1,6 +1,15 @@
 # ============================================================
-#  HubCore - Configurazione principale
+#   _    _       _      _____
+#  | |  | |     | |    / ____|
+#  | |__| |_   _| |__ | |     ___  _ __ ___
+#  |  __  | | | | '_ \| |    / _ \| '__/ _ \
+#  | |  | | |_| | |_) | |___| (_) | | |  __/
+#  |_|  |_|\__,_|_.__/ \_____\___/|_|  \___|
+#
 #  Sviluppato da Indifferenzah
+#  Le azioni supportano:
+#    [MESSAGE] [BROADCAST] [ACTIONBAR] [TITLE] [SOUND]
+#    [COMMAND] [CONSOLE] [GAMEMODE] [EFFECT] [MENU] [CLOSE] [PROXY]
 # ============================================================
 
 # Prefisso del plugin nei messaggi
@@ -23,6 +32,7 @@ sword:
   flags:
     - HIDE_ATTRIBUTES
     - HIDE_ENCHANTS
+    - HIDE_UNBREAKABLE
 
   # Aspetto quando il PvP è inattivo
   inactive:
@@ -229,3 +239,142 @@ lobby-blocks:
     flags:
       - HIDE_ATTRIBUTES
       - HIDE_UNBREAKABLE
+
+# ============================================================
+#  LAUNCHPAD
+# ============================================================
+launchpad:
+  enabled: true
+  launch_power: 5.0
+  launch_power_y: 1.5
+  top_block: LIGHT_WEIGHTED_PRESSURE_PLATE
+  bottom_block: POLISHED_DIORITE
+  actions:
+    - '[SOUND] ENTITY_BAT_TAKEOFF'
+
+# ============================================================
+#  DOUBLE JUMP
+# ============================================================
+double_jump:
+  enabled: true
+  launch_power: 1.0
+  launch_power_y: 0.9
+  cooldown: 3
+  actions:
+    - '[SOUND] ENTITY_BAT_TAKEOFF'
+# ============================================================
+#  WORLD SETTINGS
+# ============================================================
+world_settings:
+  disable_hunger_loss: true
+  disable_fall_damage: true
+  disable_player_pvp: true
+  disable_void_death: true
+  disable_fire_damage: true
+  disable_drowning: true
+  disable_off_hand_swap: true
+  disable_weather_change: true
+  disable_death_message: true
+  disable_mob_spawning: true
+  disable_item_drop: true
+  disable_item_pickup: true
+  disable_block_break: true
+  disable_block_place: true
+  disable_block_interact: true
+  disable_block_burn: true
+  disable_block_fire_spread: true
+  disable_block_leaf_decay: true
+
+# ============================================================
+#  JOIN / LEAVE MESSAGES
+#  Se il giocatore ha hubcore.announce.join/.announce.leave
+#  il messaggio viene mostrato a tutti, altrimenti è nascosto.
+# ============================================================
+join_leave_messages:
+  enabled: true
+  join_message: "&8[&a+&8] &7%player%"
+  quit_message: "&8[&c-&8] &7%player%"
+
+# ============================================================
+#  JOIN EVENTS  (eseguiti a ogni join)
+#  [TITLE] testo;sottotitolo;fadeIn;stay;fadeOut  (secondi)
+#  [SOUND] NOME_SUONO
+#  [GAMEMODE] survival|creative|adventure|spectator
+#  [EFFECT] NOME_EFFETTO;amplificatore
+# ============================================================
+join_events:
+  - "[TITLE] &#9c3ae4&lʙᴇɴᴠᴇɴᴜᴛᴏ;&#e0b3ff%player%;1;2;1"
+  - "[SOUND] ENTITY_PLAYER_LEVELUP"
+  - "[GAMEMODE] survival"
+  - "[EFFECT] SPEED;1"
+
+# ============================================================
+#  JOIN SETTINGS
+# ============================================================
+join_settings:
+  spawn_join: true
+  heal: true
+  extinguish: true
+  clear_inventory: true
+  firework:
+    enabled: true
+    first_join_only: true
+    type: BALL_LARGE
+    power: 1
+    flicker: true
+    trail: true
+    colors:
+      - AQUA
+      - RED
+      - TEAL
+      - WHITE
+
+# ============================================================
+#  ANTI WORLD DOWNLOADER
+# ============================================================
+anti_wdl:
+  enabled: true
+  notify_admins: true
+
+# ============================================================
+#  CUSTOM JOIN ITEMS
+#  Item extra consegnati al join. Le azioni supportano:
+#  [MESSAGE] [BROADCAST] [ACTIONBAR] [TITLE] [SOUND]
+#  [COMMAND] [CONSOLE] [GAMEMODE] [EFFECT] [MENU] [CLOSE] [PROXY]
+# ============================================================
+custom_join_items:
+  enabled: true
+  # Impedisce di spostare/droppare gli item
+  disable_inventory_movement: true
+  items:
+    server_selector:
+      material: COMPASS
+      amount: 1
+      slot: 4
+      display_name: "&eꜱᴇʟᴇᴢɪᴏɴᴇ ꜱᴇʀᴠᴇʀ"
+      lore:
+        - "&#d4b8ffᴛᴀꜱᴛᴏ ᴅᴇꜱᴛʀᴏ ᴘᴇʀ ᴀᴘʀɪʀᴇ!"
+      actions:
+        - "[MENU] serverselector"
+
+# ============================================================
+#  PLAYER HIDER
+# ============================================================
+player_hider:
+  enabled: true
+  slot: 8
+  disable_inventory_movement: true
+  # Secondi di cooldown tra un toggle e l'altro
+  cooldown: 3
+  not_hidden:
+    material: PURPLE_DYE
+    amount: 1
+    display_name: '&#9c3ae4ɢɪᴏᴄᴀᴛᴏʀɪ ᴀʙɪʟɪᴛᴀᴛɪ &#d4b8ff(ᴛᴀꜱᴛᴏ ᴅᴇꜱᴛʀᴏ)'
+    lore:
+      - '&#d4b8ffᴄʟɪᴄᴄᴀ ᴘᴇʀ &#a64dffɴᴀꜱᴄᴏɴᴅᴇʀᴇ &#d4b8ffᴛᴜᴛᴛɪ ɪ ɢɪᴏᴄᴀᴛᴏʀɪ!'
+  hidden:
+    material: RED_DYE
+    amount: 1
+    display_name: '&4ɢɪᴏᴄᴀᴛᴏʀɪ ᴅɪꜱᴀʙɪʟɪᴛᴀᴛɪ &#d4b8ff(ᴛᴀꜱᴛᴏ ᴅᴇꜱᴛʀᴏ)'
+    lore:
+      - '&#d4b8ffᴄʟɪᴄᴄᴀ ᴘᴇʀ &#9c3ae4ᴠᴇᴅᴇʀᴇ &#d4b8ffᴛᴜᴛᴛɪ ɪ ɢɪᴏᴄᴀᴛᴏʀɪ!'

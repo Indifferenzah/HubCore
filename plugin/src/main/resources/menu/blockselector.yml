@@ -1,5 +1,12 @@
 # ============================================================
-#  HubCore - Selettore Blocchi
+#   _    _       _      _____
+#  | |  | |     | |    / ____|
+#  | |__| |_   _| |__ | |     ___  _ __ ___
+#  |  __  | | | | '_ \| |    / _ \| '__/ _ \
+#  | |  | | |_| | |_) | |___| (_) | | |  __/
+#  |_|  |_|\__,_|_.__/ \_____\___/|_|  \___|
+#
+#  Sviluppato da Indifferenzah
 #  Configura il menu di selezione del tipo di blocco.
 #  Cliccando un blocco nel menu, lo stack di blocchi nell'hotbar
 #  cambierà materiale (il tempo di rottura/rispawn non cambia).

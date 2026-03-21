@@ -1,0 +1,31 @@
+# ============================================================
+#   _    _       _      _____
+#  | |  | |     | |    / ____|
+#  | |__| |_   _| |__ | |     ___  _ __ ___
+#  |  __  | | | | '_ \| |    / _ \| '__/ _ \
+#  | |  | | |_| | |_) | |___| (_) | | |  __/
+#  |_|  |_|\__,_|_.__/ \_____\___/|_|  \___|
+#
+#  Sviluppato da Indifferenzah
+#  Supporta PlaceholderAPI, LuckPerms e animazioni
+# ============================================================
+
+enabled: true
+
+# Intervallo di aggiornamento in ticks (20 = 1 secondo)
+update-interval: 5
+
+# ─── Titolo della sidebar ────────────────────────────────────
+title: '%animation:Lalaland%'
+
+# ─── Righe della sidebar ─────────────────────────────────────
+# Supportano placeholder (%player%, %ping%, %online%, PlaceholderAPI)
+# Le righe sono mostrate dall'alto verso il basso (la prima riga è in cima)
+lines:
+  - ''
+  - '&#c084ffɴᴏᴍᴇ&#9c8aa8: &#e0b3ff%player%'
+  - '&#c084ffᴘɪɴɢ&#9c8aa8: &#e0b3ff%ping%&#d4b8ffms'
+  - ''
+  - '&#c084ffᴏɴʟɪɴᴇ&#9c8aa8: &#e0b3ff%online%'
+  - ''
+  - '&7▶ mc.justnoobyy.it'

@@ -1,3 +1,13 @@
+# ============================================================
+#   _    _       _      _____
+#  | |  | |     | |    / ____|
+#  | |__| |_   _| |__ | |     ___  _ __ ___
+#  |  __  | | | | '_ \| |    / _ \| '__/ _ \
+#  | |  | | |_| | |_) | |___| (_) | | |  __/
+#  |_|  |_|\__,_|_.__/ \_____\___/|_|  \___|
+#
+#  Sviluppato da Indifferenzah
+# ============================================================
 # Versione del plugin — NON modificare manualmente se non sai cosa stai facendo.
 # Il plugin confronta questo valore con il tag piu' recente su GitHub al momento dell'avvio.
 version: "1.0.0"

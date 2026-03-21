@@ -2,16 +2,29 @@ package com.indifferenzah.hubcore.plugin;
 
 import com.indifferenzah.hubcore.api.HubCoreAPI;
 import com.indifferenzah.hubcore.plugin.commands.HubCoreCommand;
+import com.indifferenzah.hubcore.plugin.commands.SpawnCommand;
 import com.indifferenzah.hubcore.plugin.config.ConfigLoader;
 import com.indifferenzah.hubcore.plugin.config.MessagesLoader;
 import com.indifferenzah.hubcore.plugin.database.H2StatsService;
 import com.indifferenzah.hubcore.plugin.listener.*;
+import com.indifferenzah.hubcore.plugin.listener.DoubleJumpListener;
+import com.indifferenzah.hubcore.plugin.listener.LaunchpadListener;
 import com.indifferenzah.hubcore.plugin.service.ArmorManager;
 import com.indifferenzah.hubcore.plugin.service.EffectManager;
 import com.indifferenzah.hubcore.plugin.lobbyblocks.LobbyBlocksManager;
 import com.indifferenzah.hubcore.plugin.service.PvPServiceImpl;
+import com.indifferenzah.hubcore.plugin.commands.CustomCommandLoader;
+import com.indifferenzah.hubcore.plugin.service.AnimationsManager;
+import com.indifferenzah.hubcore.plugin.service.ChatLockManager;
+import com.indifferenzah.hubcore.plugin.service.CustomJoinItemsManager;
+import com.indifferenzah.hubcore.plugin.menu.MenuLoader;
+import com.indifferenzah.hubcore.plugin.service.MenuRegistry;
+import com.indifferenzah.hubcore.plugin.service.PlayerHiderManager;
+import com.indifferenzah.hubcore.plugin.service.ScoreboardManager;
 import com.indifferenzah.hubcore.plugin.service.SwordManager;
+import com.indifferenzah.hubcore.plugin.service.TabManager;
 import com.indifferenzah.hubcore.plugin.task.AutoSaveTask;
+import com.indifferenzah.hubcore.plugin.util.ActionExecutor;
 import com.indifferenzah.hubcore.plugin.util.ColorUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -43,6 +56,17 @@ public class HubCorePlugin extends JavaPlugin {
     private ArmorManager armorManager;
     private EffectManager effectManager;
     private LobbyBlocksManager lobbyBlocksManager;
+    private DoubleJumpListener doubleJumpListener;
+    private AnimationsManager animationsManager;
+    private TabManager tabManager;
+    private ScoreboardManager scoreboardManager;
+    private ActionExecutor actionExecutor;
+    private MenuRegistry menuRegistry;
+    private MenuLoader menuLoader;
+    private CustomJoinItemsManager customJoinItemsManager;
+    private PlayerHiderManager playerHiderManager;
+    private CustomCommandLoader customCommandLoader;
+    private ChatLockManager chatLockManager;
 
     // Versione letta da version.yml (classpath), usata nel log e nel version check
     private String localVersion = "unknown";
@@ -84,6 +108,37 @@ public class HubCorePlugin extends JavaPlugin {
         lobbyBlocksManager = new LobbyBlocksManager(this);
         saveResource("menu/blockselector.yml", false);
 
+        // Salva tab.yml, scoreboard.yml e animations.yml se non esistono ancora
+        saveResource("tab.yml", false);
+        saveResource("scoreboard.yml", false);
+        saveResource("animations.yml", false);
+
+        // Inizializza AnimationsManager (condiviso da Tab e Scoreboard) prima dei due manager
+        animationsManager = new AnimationsManager(this);
+        animationsManager.start();
+
+        // Inizializza TabManager e ScoreboardManager
+        tabManager = new TabManager(this);
+        scoreboardManager = new ScoreboardManager(this, tabManager);
+        tabManager.start();
+        scoreboardManager.start();
+
+        // Inizializza ActionExecutor, MenuRegistry e manager item custom
+        actionExecutor = new ActionExecutor(this);
+        menuRegistry = new MenuRegistry(this);
+        menuLoader = new MenuLoader(this);
+        menuLoader.loadAll();
+        customJoinItemsManager = new CustomJoinItemsManager(this);
+        playerHiderManager = new PlayerHiderManager(this);
+
+        // Inizializza sistema comandi/alias dinamici e chat lock
+        chatLockManager = new ChatLockManager();
+        customCommandLoader = new CustomCommandLoader(this);
+        customCommandLoader.loadAll();
+
+        // Registra canale BungeeCord per azione [PROXY]
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+
         // 6. Registra i servizi nell'API pubblica
         HubCoreAPI.setStatsService(statsService);
         HubCoreAPI.setPvpService(pvpService);
@@ -108,6 +163,11 @@ public class HubCorePlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Ferma i task di animazioni, tab e sidebar
+        if (animationsManager != null) animationsManager.stop();
+        if (tabManager != null) tabManager.stop();
+        if (scoreboardManager != null) scoreboardManager.stop();
+
         // Salva tutte le statistiche in cache prima di chiudere
         if (statsService != null) {
             statsService.saveAll();
@@ -136,6 +196,14 @@ public class HubCorePlugin extends JavaPlugin {
         pm.registerEvents(new PlayerSwapHandListener(this), this);
         pm.registerEvents(new InventoryClickListener(this), this);
         pm.registerEvents(new LobbyBlocksListener(this), this);
+        pm.registerEvents(new LaunchpadListener(this), this);
+        pm.registerEvents(new WorldSettingsListener(this), this);
+        doubleJumpListener = new DoubleJumpListener(this);
+        pm.registerEvents(doubleJumpListener, this);
+        pm.registerEvents(new AntiWDLListener(this), this);
+        pm.registerEvents(new CustomItemsListener(this), this);
+        pm.registerEvents(new MenuClickListener(this), this);
+        pm.registerEvents(new ChatLockListener(this), this);
     }
 
     /**
@@ -144,6 +212,7 @@ public class HubCorePlugin extends JavaPlugin {
     private void registerCommands() {
         var lamp = BukkitLamp.builder(this).build();
         lamp.register(new HubCoreCommand(this));
+        lamp.register(new SpawnCommand(this));
     }
 
     // =========================================================================
@@ -151,9 +220,9 @@ public class HubCorePlugin extends JavaPlugin {
     // =========================================================================
 
     /**
-     * Controlla in modo asincrono se e' disponibile una versione piu' recente su GitHub.
-     * Se la versione locale e' piu' nuova di quella remota, disabilita il plugin.
-     * Se quella remota e' piu' nuova, imposta il flag updateAvailable = true.
+     * Controlla in modo asincrono se è disponibile una versione più recente su GitHub.
+     * Se la versione locale è più nuova di quella remota, disabilita il plugin.
+     * Se quella remota è più nuova, imposta il flag updateAvailable = true.
      */
     private void checkVersion() {
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
@@ -306,6 +375,15 @@ public class HubCorePlugin extends JavaPlugin {
         reloadConfig();
         messagesLoader.load();
 
+        // Ricarica animations.yml, tab.yml e scoreboard.yml
+        if (animationsManager != null) animationsManager.load();
+        if (tabManager != null) tabManager.load();
+        if (scoreboardManager != null) scoreboardManager.load();
+        if (customJoinItemsManager != null) customJoinItemsManager.load();
+        if (playerHiderManager != null) playerHiderManager.load();
+        if (menuLoader != null) menuLoader.loadAll();
+        if (customCommandLoader != null) customCommandLoader.loadAll();
+
         // Ricarica il menu del selettore blocchi (blockselector.yml)
         lobbyBlocksManager.reload();
 
@@ -387,5 +465,45 @@ public class HubCorePlugin extends JavaPlugin {
 
     public LobbyBlocksManager getLobbyBlocksManager() {
         return lobbyBlocksManager;
+    }
+
+    public DoubleJumpListener getDoubleJumpListener() {
+        return doubleJumpListener;
+    }
+
+    public AnimationsManager getAnimationsManager() {
+        return animationsManager;
+    }
+
+    public TabManager getTabManager() {
+        return tabManager;
+    }
+
+    public ScoreboardManager getScoreboardManager() {
+        return scoreboardManager;
+    }
+
+    public ActionExecutor getActionExecutor() {
+        return actionExecutor;
+    }
+
+    public MenuRegistry getMenuRegistry() {
+        return menuRegistry;
+    }
+
+    public CustomJoinItemsManager getCustomJoinItemsManager() {
+        return customJoinItemsManager;
+    }
+
+    public PlayerHiderManager getPlayerHiderManager() {
+        return playerHiderManager;
+    }
+
+    public CustomCommandLoader getCustomCommandLoader() {
+        return customCommandLoader;
+    }
+
+    public ChatLockManager getChatLockManager() {
+        return chatLockManager;
     }
 }

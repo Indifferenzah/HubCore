@@ -1,0 +1,5 @@
+gamemode:
+  permission: hubcore.alias.gm
+  enabled: true
+  aliases:
+    - gm
